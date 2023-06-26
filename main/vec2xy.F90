@@ -132,6 +132,8 @@ MODULE MOD_vec2xy
    REAL(r8), allocatable :: a_fm     (:,:)    !integral of profile function for momentum
    REAL(r8), allocatable :: a_fh     (:,:)    !integral of profile function for heat
    REAL(r8), allocatable :: a_fq     (:,:)    !integral of profile function for moisture
+   REAL(r8), allocatable :: b_ustar  (:,:)    !u* in similarity theory [m/s],Correct output
+
 
    REAL(r8), allocatable :: a_us10m  (:,:)    !10m u-velocity [m/s]
    REAL(r8), allocatable :: a_vs10m  (:,:)    !10m v-velocity [m/s]
@@ -225,6 +227,8 @@ CONTAINS
           ! ------------------------------------------------------------------------------------------
           ! Mapping the fluxes and state variables at patch [numpatch] to grid [lon_points,lat_points]
           ! ------------------------------------------------------------------------------------------
+
+            b_ustar   (i,j) = 0
             sumwt     (i,j) = 0.
             urbwt     (i,j) = 0.
             a_taux    (i,j) = 0.
@@ -348,6 +352,7 @@ CONTAINS
                sumwt(i,j) = sumwt(i,j) + patchfrac(np)
 
              ! Fluxes
+               b_ustar  (i,j) = b_ustar  (i,j) + patchfrac(np)*ustar  (np)
                a_taux   (i,j) = a_taux   (i,j) + patchfrac(np)*taux   (np)
                a_tauy   (i,j) = a_tauy   (i,j) + patchfrac(np)*tauy   (np)
                a_fsena  (i,j) = a_fsena  (i,j) + patchfrac(np)*fsena  (np)
@@ -501,6 +506,7 @@ CONTAINS
             !  CALL abort
             ENDIF
             IF(sumwt(i,j).gt.0.00001)THEN
+               b_ustar  (i,j) = b_ustar  (i,j) / sumwt(i,j)
                a_taux   (i,j) = a_taux   (i,j) / sumwt(i,j)
                a_tauy   (i,j) = a_tauy   (i,j) / sumwt(i,j)
                a_fsena  (i,j) = a_fsena  (i,j) / sumwt(i,j)
@@ -623,6 +629,7 @@ CONTAINS
                frac(i,j) = sumwt(i,j)
 
             ELSE
+               b_ustar  (i,j) = spval
                a_taux   (i,j) = spval
                a_tauy   (i,j) = spval
                a_fsena  (i,j) = spval
@@ -1066,6 +1073,7 @@ CONTAINS
       DO j = 1, lat_points
          DO i = 1, lon_points
 
+            CALL acc(b_ustar     (i,j), 1., f_b_ustar   (i,j))
             CALL acc(a_xy_us     (i,j), 1., f_xy_us     (i,j))
             CALL acc(a_xy_vs     (i,j), 1., f_xy_vs     (i,j))
             CALL acc(a_xy_t      (i,j), 1., f_xy_t      (i,j))
@@ -1228,6 +1236,8 @@ CONTAINS
       IMPLICIT NONE
 
       !---------------------------------------------------------------------
+      allocate (b_ustar     (lon_points,lat_points))
+
       allocate (a_xy_us     (lon_points,lat_points))
       allocate (a_xy_vs     (lon_points,lat_points))
       allocate (a_xy_t      (lon_points,lat_points))
@@ -1376,6 +1386,7 @@ CONTAINS
       IMPLICIT NONE
 
       !---------------------------------------------------------------------
+      deallocate ( b_ustar        )
       deallocate ( a_xy_us        )
       deallocate ( a_xy_vs        )
       deallocate ( a_xy_t         )

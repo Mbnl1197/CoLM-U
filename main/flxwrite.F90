@@ -155,6 +155,7 @@
               IF (f_lake_icefrac(l,i,j) /= spval) f_lake_icefrac(l,i,j) = f_lake_icefrac(l,i,j) / a  ! lake ice fraction cover [0-1]
            ENDDO
 
+           IF (f_b_ustar(i,j) /= spval) f_b_ustar(i,j) = f_b_ustar(i,j) / a  ! u* in similarity theory [m/s]
            IF (f_ustar  (i,j) /= spval) f_ustar  (i,j) = f_ustar  (i,j) / a  ! u* in similarity theory [m/s]
            IF (f_tstar  (i,j) /= spval) f_tstar  (i,j) = f_tstar  (i,j) / a  ! t* in similarity theory [kg/kg]
            IF (f_qstar  (i,j) /= spval) f_qstar  (i,j) = f_qstar  (i,j) / a  ! q* in similarity theory [kg/kg]
@@ -301,6 +302,7 @@
      write(luout) f_t_lake      (:,:,:) ! lake temperature [K]
      write(luout) f_lake_icefrac(:,:,:) ! lake ice fraction cover [0-1]
 
+     write(luout) f_b_ustar(:,:)   ! u* in similarity theory [m/s]
      write(luout) f_ustar  (:,:)   ! u* in similarity theory [m/s]
      write(luout) f_tstar  (:,:)   ! t* in similarity theory [kg/kg]
      write(luout) f_qstar  (:,:)   ! q* in similarity theory [kg/kg]

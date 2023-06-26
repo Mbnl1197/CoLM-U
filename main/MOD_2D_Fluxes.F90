@@ -18,6 +18,7 @@ INTEGER,  allocatable :: mask     (:,:)  ! grid mask flag
 REAL(r8), allocatable :: frac     (:,:)  ! grid total fraction
 REAL(r8), allocatable :: area     (:,:)  ! grid cell area
 
+REAL(r8), allocatable :: f_b_ustar(:,:)  ! u* in similarity theory [m/s],Correct output
 REAL(r8), allocatable :: f_taux   (:,:)  ! wind stress: E-W [kg/m/s2]
 REAL(r8), allocatable :: f_tauy   (:,:)  ! wind stress: N-S [kg/m/s2]
 REAL(r8), allocatable :: f_fsena  (:,:)  ! sensible heat from canopy height to atmosphere [W/m2]
@@ -179,6 +180,7 @@ SUBROUTINE allocate_2D_Fluxes
 USE precision
 IMPLICIT NONE
 
+allocate ( f_b_ustar(lon_points,lat_points) )
 allocate ( mask     (lon_points,lat_points) )  ! grid mask
 allocate ( frac     (lon_points,lat_points) )  ! grid total fraction
 allocate ( area     (lon_points,lat_points) )  ! grid cell area
@@ -343,6 +345,7 @@ mask        (:,:) = 0
 frac        (:,:) = spval
 area        (:,:) = spval
 
+f_b_ustar   (:,:) = spval
 f_taux      (:,:) = spval
 f_tauy      (:,:) = spval
 f_fsena     (:,:) = spval
@@ -473,6 +476,7 @@ SUBROUTINE deallocate_2D_Fluxes
 ! --------------------------------------------------------------------
 ! Deallocates memory for CLM 2d [:,:] variables
 ! --------------------------------------------------------------------
+deallocate ( f_b_ustar   ) 
 
 deallocate ( mask     )  ! grid mask
 deallocate ( frac     )  ! grid total fraction

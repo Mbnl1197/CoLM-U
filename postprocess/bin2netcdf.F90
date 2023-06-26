@@ -165,6 +165,7 @@ CONTAINS
       read(11) f_t_lake     (:,:,:)   ! lake temperature [K]
       read(11) f_lake_icefrac (:,:,:)   ! lake ice fraction cover [0-1]
 
+      read(11) f_b_ustar(:,:)   ! u* in similarity theory [m/s]
       read(11) f_ustar  (:,:)   ! u* in similarity theory [m/s]
       read(11) f_tstar  (:,:)   ! t* in similarity theory [kg/kg]
       read(11) f_qstar  (:,:)   ! q* in similarity theory [kg/kg]
@@ -815,6 +816,13 @@ CONTAINS
       CALL sanity( nf90_put_att(ncid, varid, '_FillValue', spval) )
 
       ! u* in similarity theory [m/s]
+      CALL sanity( nf90_def_var(ncid, 'f_b_ustar', nf90_double, (/xid,yid/), varid) )
+      CALL sanity( nf90_put_att(ncid, varid, 'long_name','u* in similarity theory [m/s],correct') )
+      CALL sanity( nf90_put_att(ncid, varid, 'units','m/s') )
+      CALL sanity( nf90_put_att(ncid, varid, 'missing_value', spval) )
+      CALL sanity( nf90_put_att(ncid, varid, '_FillValue', spval) )
+
+      ! u* in similarity theory [m/s]
       CALL sanity( nf90_def_var(ncid, 'f_ustar', nf90_double, (/xid,yid/), varid) )
       CALL sanity( nf90_put_att(ncid, varid, 'long_name','u* in similarity theory [m/s]') )
       CALL sanity( nf90_put_att(ncid, varid, 'units','m/s') )
@@ -1449,6 +1457,11 @@ CONTAINS
       ENDDO
       CALL sanity( nf90_inq_varid(ncid,'f_lake_icefrac',varid) )
       CALL sanity( nf90_put_var(ncid,varid,tmp2) )
+
+      ! u* in similarity theory [m/s]
+      CALL sanity( nf90_inq_varid(ncid,'f_b_ustar',varid) )
+      CALL sanity( nf90_put_var(ncid,varid,f_b_ustar) )
+
 
       ! u* in similarity theory [m/s]
       CALL sanity( nf90_inq_varid(ncid,'f_ustar',varid) )
@@ -2197,6 +2210,13 @@ CONTAINS
       CALL sanity( nf90_def_var(ncid, 'LAKEICEFRAC', nf90_float, (/xid,yid,lakelevid,timeid/), varid) )
       CALL sanity( nf90_put_att(ncid, varid, 'long_name','lake ice fraction cover [0-1]') )
       CALL sanity( nf90_put_att(ncid, varid, 'units','0-1') )
+      CALL sanity( nf90_put_att(ncid, varid, 'missing_value', spval_r4) )
+      CALL sanity( nf90_put_att(ncid, varid, '_FillValue', spval_r4) )
+
+      ! u* in similarity theory [m/s], NONE
+      CALL sanity( nf90_def_var(ncid, 'f_b_ustar', nf90_float, (/xid,yid,timeid/), varid) )
+      CALL sanity( nf90_put_att(ncid, varid, 'long_name','u* in similarity theory [m/s]') )
+      CALL sanity( nf90_put_att(ncid, varid, 'units','m/s') )
       CALL sanity( nf90_put_att(ncid, varid, 'missing_value', spval_r4) )
       CALL sanity( nf90_put_att(ncid, varid, '_FillValue', spval_r4) )
 
@@ -3047,6 +3067,13 @@ CONTAINS
       tmp2 = tmp2(:,lat_points:1:-1,:)
       CALL sanity( nf90_inq_varid(ncid,'LAKEICEFRAC',varid) )
       CALL sanity( nf90_put_var(ncid,varid,tmp2) )
+
+      vars(1:max(lon_points/2,1),:) = f_b_ustar((lon_points/2+1):lon_points,:)
+      vars((lon_points/2+1):lon_points,:) = f_b_ustar(1:max(lon_points/2,1),:)
+      vars = vars(:,lat_points:1:-1)
+      ! u* in similarity theory [m/s]
+      CALL sanity( nf90_inq_varid(ncid,'f_b_ustar',varid) )
+      CALL sanity( nf90_put_var(ncid,varid,vars) )
 
       vars(1:max(lon_points/2,1),:) = f_ustar((lon_points/2+1):lon_points,:)
       vars((lon_points/2+1):lon_points,:) = f_ustar(1:max(lon_points/2,1),:)
